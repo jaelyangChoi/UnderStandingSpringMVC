@@ -21,9 +21,10 @@ import java.util.Map;
 @WebServlet(name = "frontControllerServletV5", urlPatterns = "/front-controller/v5/*")
 public class FrontControllerServletV5 extends HttpServlet {
     //private Map<String, ControllerV4> controllerMap = new HashMap<>(); 이전 버전
-    private final Map<String, Object> handlerMappingMap = new HashMap<>(); //V3든 V4든 수용할 수 있도록
+    private final Map<String, Object> handlerMappingMap = new HashMap<>(); //V3든 V4든 수용할 수 있도록 Object로 받는다.
     private final List<MyHandlerAdapter> handlerAdapters = new ArrayList<>();
 
+    //생성자는 핸들러 매핑과 어댑터를 초기화(등록)한다.
     public FrontControllerServletV5() {
         initHandlerMappingMap();
         initHandlerAdapters();
@@ -42,7 +43,7 @@ public class FrontControllerServletV5 extends HttpServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Object handler = getHandler(request);
-        if (handler == null) { //url에 해당하는 컨트롤러가 없을 경우 404 에러
+        if (handler == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -54,6 +55,7 @@ public class FrontControllerServletV5 extends HttpServlet {
         view.render(modelView.getModel(), request, response);
     }
 
+    //핸들러를 처리할 수 있는 어댑터 조회
     private MyHandlerAdapter getHandlerAdapter(Object handler) {
         for (MyHandlerAdapter adapter : handlerAdapters)
             if (adapter.supports(handler))
@@ -61,6 +63,7 @@ public class FrontControllerServletV5 extends HttpServlet {
         throw new IllegalArgumentException("handler adapter를 찾을 수 없습니다. handler = " + handler);
     }
 
+    //핸들러 매핑 정보인 handlerMappingMap 에서 URL에 매핑된 핸들러(컨트롤러) 객체를 찾아서 반환
     private Object getHandler(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         return handlerMappingMap.get(requestURI);
