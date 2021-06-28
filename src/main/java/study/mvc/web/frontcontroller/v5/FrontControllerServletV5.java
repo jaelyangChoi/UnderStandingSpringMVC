@@ -5,7 +5,11 @@ import study.mvc.web.frontcontroller.MyView;
 import study.mvc.web.frontcontroller.v3.controller.MemberFormControllerV3;
 import study.mvc.web.frontcontroller.v3.controller.MemberListControllerV3;
 import study.mvc.web.frontcontroller.v3.controller.MemberSaveControllerV3;
+import study.mvc.web.frontcontroller.v4.controller.MemberFormControllerV4;
+import study.mvc.web.frontcontroller.v4.controller.MemberListControllerV4;
+import study.mvc.web.frontcontroller.v4.controller.MemberSaveControllerV4;
 import study.mvc.web.frontcontroller.v5.adapter.ControllerV3HandlerAdapter;
+import study.mvc.web.frontcontroller.v5.adapter.ControllerV4HandlerAdapter;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -30,16 +34,6 @@ public class FrontControllerServletV5 extends HttpServlet {
         initHandlerAdapters();
     }
 
-    private void initHandlerAdapters() {
-        handlerAdapters.add(new ControllerV3HandlerAdapter());
-    }
-
-    private void initHandlerMappingMap() {
-        handlerMappingMap.put("/front-controller/v5/v3/members/new-form", new MemberFormControllerV3());
-        handlerMappingMap.put("/front-controller/v5/v3/members/save", new MemberSaveControllerV3());
-        handlerMappingMap.put("/front-controller/v5/v3/members", new MemberListControllerV3());
-    }
-
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Object handler = getHandler(request);
@@ -53,6 +47,24 @@ public class FrontControllerServletV5 extends HttpServlet {
 
         MyView view = viewResolver(modelView.getViewName());
         view.render(modelView.getModel(), request, response);
+    }
+
+    /* 새로운 컨트롤러와 그에 맞는 어댑터가 추가되더라도 이 부분만 수정하면 된다! 뼈대를 흔들지 않는다! */
+    //url에 매핍되는 핸들러를 반환
+    private void initHandlerMappingMap() {
+        handlerMappingMap.put("/front-controller/v5/v3/members/new-form", new MemberFormControllerV3());
+        handlerMappingMap.put("/front-controller/v5/v3/members/save", new MemberSaveControllerV3());
+        handlerMappingMap.put("/front-controller/v5/v3/members", new MemberListControllerV3());
+
+        handlerMappingMap.put("/front-controller/v5/v4/members/new-form", new MemberFormControllerV4());
+        handlerMappingMap.put("/front-controller/v5/v4/members/save", new MemberSaveControllerV4());
+        handlerMappingMap.put("/front-controller/v5/v4/members", new MemberListControllerV4());
+    }
+
+    // 각 핸들러마다의 어댑터를 담아둔다.
+    private void initHandlerAdapters() {
+        handlerAdapters.add(new ControllerV3HandlerAdapter());
+        handlerAdapters.add(new ControllerV4HandlerAdapter());
     }
 
     //핸들러를 처리할 수 있는 어댑터 조회
